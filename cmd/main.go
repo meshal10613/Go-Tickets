@@ -47,17 +47,22 @@ func passwordValidation(fl validator.FieldLevel) bool {
 }
 
 type User struct {
-	Name  string `json:"name" form:"name" query:"name" validate:"required"`
-	Email string `json:"email" form:"email" query:"email" validate:"required,email"`
+	gorm.Model
+	Name  string `json:"name" form:"name" query:"name" validate:"required" gorm:"type:varchar(100) not null"`
+	Email string `json:"email" form:"email" query:"email" validate:"required,email" gorm:"type:varchar(100); uniqueIndex; not null"`
 	// Password string `json:"password" form:"password" query:"password" validate:"required,min=8,containsany=ABCDEFGHIJKLMNOPQRSTUVWXYZ,containsany=abcdefghijklmnopqrstuvwxyz,containsany=0123456789,containsany=!@#$%^&*()_+-=[]{}|;:,.<>?/"`
-	Password string `json:"password" form:"password" query:"password" validate:"required,password"`
+	Password string `json:"password" form:"password" query:"password" validate:"required,password" gorm:"type:varchar(255) not null"`
 }
 
 func main() {
 	dsn := "host=localhost user=postgres password=4219 dbname=go-tickets port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		TranslateError: true,
+	})
+	db.AutoMigrate(&User{})
 	if err != nil {
-		panic("failed to connect database")
+		// panic("failed to connect database")
+		panic(fmt.Sprintf("failed to connect database: %v", err))
 	}
 
 	port := 5000
@@ -99,7 +104,22 @@ func main() {
 			})
 		}
 
-		return c.JSON(http.StatusCreated, u)
+		//? save to database
+		result := db.Create(&u)
+		if result.Error != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]any{
+				"error": result.Error.Error(),
+			})
+		}
+
+		return c.JSON(http.StatusCreated, map[string]any{
+			"message": "User created successfully",
+			"result": map[string]any{
+				"id":    u.ID,
+				"name":  u.Name,
+				"email": u.Email,
+			},
+		})
 	})
 
 	red := color.New(color.FgRed).SprintFunc()
