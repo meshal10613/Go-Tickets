@@ -59,11 +59,13 @@ func main() {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		TranslateError: true,
 	})
-	db.AutoMigrate(&User{})
 	if err != nil {
 		// panic("failed to connect database")
 		panic(fmt.Sprintf("failed to connect database: %v", err))
 	}
+
+	fmt.Println("Database connected successfully")
+	db.AutoMigrate(&User{})
 
 	port := 5000
 	e := echo.New()
