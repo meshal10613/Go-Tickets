@@ -1,6 +1,7 @@
 package user
 
 import (
+	"errors"
 	httpsresponse "go-tickets/internel/httpsResponse"
 	"go-tickets/internel/user/dto"
 	"net/http"
@@ -38,6 +39,13 @@ func (h *userHandler) CreateUser(ctx *echo.Context) error {
 
 	response, err := h.service.CreateUser(&req)
 	if err != nil {
+		if errors.Is(err, ErrorAlreadyExist) {
+			return ctx.JSON(http.StatusConflict, httpsresponse.Error{
+				Success: false,
+				Message: err.Error(),
+			})
+		}
+
 		return ctx.JSON(http.StatusInternalServerError, httpsresponse.Error{
 			Success: false,
 			Message: "Failed to create user",
