@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"go-tickets/internel/config"
 	"go-tickets/internel/user"
 	"net/http"
@@ -26,10 +25,9 @@ func StartServer(db *gorm.DB, cfg *config.Config) {
 	user.RegisterRoutes(e, db)
 
 	red := color.New(color.FgRed).SprintFunc()
+	color.Green("🚀 Server running at http://localhost:%s", cfg.Port)
 
-	color.Green("🚀 Server is starting on port http://localhost:%s \n", cfg.Port)
-
-	if err := e.Start(fmt.Sprintf(":%s", cfg.Port)); err != nil {
+	if err := e.Start(":" + cfg.Port); err != nil && err != http.ErrServerClosed {
 		color.Red("❌ Failed to start server: %v", err)
 		e.Logger.Error(red(err.Error()))
 	}

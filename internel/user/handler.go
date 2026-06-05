@@ -19,8 +19,8 @@ func NewUserHandler(service *service) *userHandler {
 	}
 }
 
-func (h *userHandler) CreateUser(ctx *echo.Context) error {
-	var req dto.CreateUserRequest
+func (h *userHandler) RegisterUser(ctx *echo.Context) error {
+	var req dto.RegisterUserRequest
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
 			Success: false,
@@ -37,7 +37,7 @@ func (h *userHandler) CreateUser(ctx *echo.Context) error {
 		})
 	}
 
-	response, err := h.service.CreateUser(&req)
+	response, err := h.service.RegisterUser(&req)
 	if err != nil {
 		if errors.Is(err, ErrorAlreadyExist) {
 			return ctx.JSON(http.StatusConflict, httpsresponse.Error{
@@ -48,13 +48,53 @@ func (h *userHandler) CreateUser(ctx *echo.Context) error {
 
 		return ctx.JSON(http.StatusInternalServerError, httpsresponse.Error{
 			Success: false,
-			Message: "Failed to create user",
+			Message: "Failed to register user",
 			Details: err.Error(),
 		})
 	}
 	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
 		Success: true,
-		Message: "User created successfully",
+		Message: "User registered successfully",
+		Data:    response,
+	})
+}
+
+func (h *userHandler) LoginUser(ctx *echo.Context) error {
+	var req dto.LoginUserRequest
+	if err := ctx.Bind(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+			Success: false,
+			Message: "Invalid request payload",
+			Details: err.Error(),
+		})
+	}
+
+	if err := ctx.Validate(&req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+			Success: false,
+			Message: "Validation failed",
+			Details: err.Error(),
+		})
+	}
+
+	response, err := h.service.LoginUser(&req)
+	if err != nil {
+		if errors.Is(err, ErrorInvalidCredentials) {
+			return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+				Success: false,
+				Message: err.Error(),
+			})
+		}
+
+		return ctx.JSON(http.StatusInternalServerError, httpsresponse.Error{
+			Success: false,
+			Message: "Failed to login user",
+			Details: err.Error(),
+		})
+	}
+	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
+		Success: true,
+		Message: "User logged in successfully",
 		Data:    response,
 	})
 }

@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"go-tickets/internel/config"
-	"go-tickets/server"
+	"go-tickets/internel/server"
 )
 
 func main() {

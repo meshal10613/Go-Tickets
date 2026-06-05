@@ -18,6 +18,7 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	userService := NewUserService(userRepository)
 	userHandler := NewUserHandler(userService)
 
-	api := e.Group("/api/v1")
-	api.POST("/users", userHandler.CreateUser)
+	api := e.Group("/api/v1/auth")
+	api.POST("/register", userHandler.RegisterUser)
+	api.POST("/login", userHandler.LoginUser)
 }
