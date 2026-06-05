@@ -2,22 +2,25 @@ package user
 
 import (
 	"errors"
+	"go-tickets/internel/auth"
 	"go-tickets/internel/user/dto"
 )
 
 var ErrorInvalidCredentials = errors.New("Invalid email or password")
 
 type service struct {
-	repo UserRepository
+	repo       UserRepository
+	jwtService auth.JwtService
 }
 
-func NewUserService(repo UserRepository) *service {
+func NewUserService(repo UserRepository, jwtService auth.JwtService) *service {
 	return &service{
-		repo: repo,
+		repo:       repo,
+		jwtService: jwtService,
 	}
 }
 
-func (s *service) RegisterUser(req *dto.RegisterUserRequest) (*dto.UserResponse, error) {
+func (s *service) RegisterUser(req *dto.RegisterUserRequest) (*dto.UserTokenResponse, error) {
 	var err error
 	user := User{
 		Name:  req.Name,
@@ -30,26 +33,32 @@ func (s *service) RegisterUser(req *dto.RegisterUserRequest) (*dto.UserResponse,
 		return nil, err
 	}
 
-	//? generate token
-
-
 	err = s.repo.RegisterUser(&user)
 	if err != nil {
 		return nil, err
 	}
 
-	response := dto.UserResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt.String(),
-		UpdatedAt: user.UpdatedAt.String(),
+	// //? generate token
+	token, err := s.jwtService.GenerateToken(user.ID, user.Name, user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	response := dto.UserTokenResponse{
+		Token: token,
+		User: dto.UserResponse{
+			ID:        user.ID,
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt.String(),
+			UpdatedAt: user.UpdatedAt.String(),
+		},
 	}
 
 	return &response, nil
 }
 
-func (s *service) LoginUser(req *dto.LoginUserRequest) (*dto.UserResponse, error) {
+func (s *service) LoginUser(req *dto.LoginUserRequest) (*dto.UserTokenResponse, error) {
 	user, err := s.repo.GetUserByEmail(req.Email)
 	if err != nil {
 		return nil, err
@@ -60,12 +69,21 @@ func (s *service) LoginUser(req *dto.LoginUserRequest) (*dto.UserResponse, error
 		return nil, ErrorInvalidCredentials
 	}
 
-	response := dto.UserResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt.String(),
-		UpdatedAt: user.UpdatedAt.String(),
+	//? generate token
+	token, err := s.jwtService.GenerateToken(user.ID, user.Name, user.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	response := dto.UserTokenResponse{
+		Token: token,
+		User: dto.UserResponse{
+			ID:        user.ID,
+			Name:      user.Name,
+			Email:     user.Email,
+			CreatedAt: user.CreatedAt.String(),
+			UpdatedAt: user.UpdatedAt.String(),
+		},
 	}
 
 	return &response, nil

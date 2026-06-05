@@ -7,3 +7,8 @@ type UserResponse struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }
+
+type UserTokenResponse struct {
+	Token string       `json:"token,omitempty"`
+	User  UserResponse `json:"user"`
+}

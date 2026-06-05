@@ -1,6 +1,7 @@
 package user
 
 import (
+	"go-tickets/internel/auth"
 	"go-tickets/internel/validation"
 
 	"github.com/go-playground/validator/v10"
@@ -15,7 +16,8 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	e.Validator = validation.NewCustomValidator(validate)
 
 	userRepository := NewUserRepository(db)
-	userService := NewUserService(userRepository)
+	jwtService := auth.NewJwtService("") //? You can pass secret key from config
+	userService := NewUserService(userRepository, jwtService)
 	userHandler := NewUserHandler(userService)
 
 	api := e.Group("/api/v1/auth")
