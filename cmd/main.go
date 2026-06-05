@@ -10,8 +10,6 @@ import (
 	"github.com/fatih/color"
 	"github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
 func main() {
@@ -20,16 +18,8 @@ func main() {
 		panic(fmt.Sprintf("failed to load environment variables: %v", err))
 	}
 	port := cfg.Port
-	dsn := cfg.Dsn
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		TranslateError: true,
-	})
-	if err != nil {
-		panic(fmt.Sprintf("failed to connect database: %v", err))
-	}
-
-	fmt.Println("Database connected successfully")
+	db := config.ConnectDatabase(cfg)
 	db.AutoMigrate(&user.User{})
 
 	e := echo.New()
