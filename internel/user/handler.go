@@ -9,17 +9,17 @@ import (
 	"github.com/labstack/echo/v5"
 )
 
-type userHandler struct {
+type handler struct {
 	service *service
 }
 
-func NewUserHandler(service *service) *userHandler {
-	return &userHandler{
+func NewHandler(service *service) *handler {
+	return &handler{
 		service: service,
 	}
 }
 
-func (h *userHandler) RegisterUser(ctx *echo.Context) error {
+func (h *handler) RegisterUser(ctx *echo.Context) error {
 	var req dto.RegisterUserRequest
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
@@ -59,7 +59,7 @@ func (h *userHandler) RegisterUser(ctx *echo.Context) error {
 	})
 }
 
-func (h *userHandler) LoginUser(ctx *echo.Context) error {
+func (h *handler) LoginUser(ctx *echo.Context) error {
 	var req dto.LoginUserRequest
 	if err := ctx.Bind(&req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
@@ -99,7 +99,7 @@ func (h *userHandler) LoginUser(ctx *echo.Context) error {
 	})
 }
 
-func (h *userHandler) GetMe(ctx *echo.Context) error {
+func (h *handler) GetMe(ctx *echo.Context) error {
 	userID, ok := ctx.Get("user_id").(uint)
 	if !ok {
 		return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{

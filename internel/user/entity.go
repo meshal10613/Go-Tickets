@@ -1,6 +1,8 @@
 package user
 
 import (
+	"go-tickets/internel/user/dto"
+
 	"gorm.io/gorm"
 
 	"golang.org/x/crypto/bcrypt"
@@ -24,4 +26,17 @@ func (u *User) hashPassword(password string) error {
 
 func (u *User) checkPassword(password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+}
+
+func (e *User) ToResponse(token string) *dto.UserTokenResponse {
+	return &dto.UserTokenResponse{
+		Token: token,
+		User: dto.UserResponse{
+			ID:        e.ID,
+			Name:      e.Name,
+			Email:     e.Email,
+			CreatedAt: e.CreatedAt.String(),
+			UpdatedAt: e.UpdatedAt.String(),
+		},
+	}
 }

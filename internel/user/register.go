@@ -18,8 +18,8 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 
 	userRepository := NewUserRepository(db)
 	jwtService := auth.NewJwtService("") //? You can pass secret key from config
-	userService := NewUserService(userRepository, jwtService)
-	userHandler := NewUserHandler(userService)
+	userService := NewService(userRepository, jwtService)
+	userHandler := NewHandler(userService)
 
 	api := e.Group("/api/v1/auth")
 	api.POST("/register", userHandler.RegisterUser)

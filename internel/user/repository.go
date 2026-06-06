@@ -8,23 +8,23 @@ import (
 
 var ErrorAlreadyExist = errors.New("User with this email already exists")
 
-type UserRepository interface {
-	RegisterUser(user *User) error
-	GetUserByEmail(email string) (*User, error)
+type Repository interface {
+	Register(user *User) error
+	GetByEmail(email string) (*User, error)
 	// CheckPassword(password string) error
 }
 
-type userRepository struct {
+type repository struct {
 	db *gorm.DB
 }
 
-func NewUserRepository(db *gorm.DB) UserRepository {
-	return &userRepository{
+func NewUserRepository(db *gorm.DB) Repository {
+	return &repository{
 		db: db,
 	}
 }
 
-func (r *userRepository) RegisterUser(user *User) error {
+func (r *repository) Register(user *User) error {
 	result := r.db.Create(user)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrDuplicatedKey) {
@@ -37,7 +37,7 @@ func (r *userRepository) RegisterUser(user *User) error {
 	return nil
 }
 
-func (r *userRepository) GetUserByEmail(email string) (*User, error) {
+func (r *repository) GetByEmail(email string) (*User, error) {
 	var user User
 	result := r.db.Where(&User{Email: email}).First(&user)
 	if result.Error != nil {

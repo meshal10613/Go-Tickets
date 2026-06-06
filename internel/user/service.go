@@ -9,11 +9,11 @@ import (
 var ErrorInvalidCredentials = errors.New("Invalid email or password")
 
 type service struct {
-	repo       UserRepository
+	repo       Repository
 	jwtService auth.JwtService
 }
 
-func NewUserService(repo UserRepository, jwtService auth.JwtService) *service {
+func NewService(repo Repository, jwtService auth.JwtService) *service {
 	return &service{
 		repo:       repo,
 		jwtService: jwtService,
@@ -33,7 +33,7 @@ func (s *service) RegisterUser(req *dto.RegisterUserRequest) (*dto.UserTokenResp
 		return nil, err
 	}
 
-	err = s.repo.RegisterUser(&user)
+	err = s.repo.Register(&user)
 	if err != nil {
 		return nil, err
 	}
@@ -44,22 +44,11 @@ func (s *service) RegisterUser(req *dto.RegisterUserRequest) (*dto.UserTokenResp
 		return nil, err
 	}
 
-	response := dto.UserTokenResponse{
-		Token: token,
-		User: dto.UserResponse{
-			ID:        user.ID,
-			Name:      user.Name,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt.String(),
-			UpdatedAt: user.UpdatedAt.String(),
-		},
-	}
-
-	return &response, nil
+	return user.ToResponse(token), nil
 }
 
 func (s *service) LoginUser(req *dto.LoginUserRequest) (*dto.UserTokenResponse, error) {
-	user, err := s.repo.GetUserByEmail(req.Email)
+	user, err := s.repo.GetByEmail(req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -75,16 +64,5 @@ func (s *service) LoginUser(req *dto.LoginUserRequest) (*dto.UserTokenResponse, 
 		return nil, err
 	}
 
-	response := dto.UserTokenResponse{
-		Token: token,
-		User: dto.UserResponse{
-			ID:        user.ID,
-			Name:      user.Name,
-			Email:     user.Email,
-			CreatedAt: user.CreatedAt.String(),
-			UpdatedAt: user.UpdatedAt.String(),
-		},
-	}
-
-	return &response, nil
+	return user.ToResponse(token), nil
 }
