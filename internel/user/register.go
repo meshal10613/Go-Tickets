@@ -2,6 +2,7 @@ package user
 
 import (
 	"go-tickets/internel/auth"
+	"go-tickets/internel/middlewares"
 	"go-tickets/internel/validation"
 
 	"github.com/go-playground/validator/v10"
@@ -23,4 +24,5 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	api := e.Group("/api/v1/auth")
 	api.POST("/register", userHandler.RegisterUser)
 	api.POST("/login", userHandler.LoginUser)
+	api.GET("/me", userHandler.GetMe, middlewares.AuthMiddleware(jwtService))
 }

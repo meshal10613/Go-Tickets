@@ -11,7 +11,7 @@ var ErrorAlreadyExist = errors.New("User with this email already exists")
 type UserRepository interface {
 	RegisterUser(user *User) error
 	GetUserByEmail(email string) (*User, error)
-	CheckPassword(password string) error
+	// CheckPassword(password string) error
 }
 
 type userRepository struct {
@@ -49,7 +49,7 @@ func (r *userRepository) GetUserByEmail(email string) (*User, error) {
 	return &user, nil
 }
 
-func (r *userRepository) CheckPassword(password string) error {
-	//? Implement password checking logic here
-	return nil
-}
+// func (r *userRepository) CheckPassword(password string) error {
+// 	//? Implement password checking logic here
+// 	return nil
+// }

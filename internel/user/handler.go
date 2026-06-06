@@ -98,3 +98,28 @@ func (h *userHandler) LoginUser(ctx *echo.Context) error {
 		Data:    response,
 	})
 }
+
+func (h *userHandler) GetMe(ctx *echo.Context) error {
+	userID, ok := ctx.Get("user_id").(uint)
+	if !ok {
+		return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+			Success: false,
+			Message: "Failed to retrieve authenticated user information",
+		})
+	}
+
+	email, _ := ctx.Get("email").(string)
+	name, _ := ctx.Get("name").(string)
+
+	response := dto.UserResponse{
+		ID:    userID,
+		Name:  name,
+		Email: email,
+	}
+
+	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
+		Success: true,
+		Message: "User profile retrieved successfully",
+		Data:    response,
+	})
+}
