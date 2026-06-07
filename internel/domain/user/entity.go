@@ -1,7 +1,7 @@
 package user
 
 import (
-	"go-tickets/internel/user/dto"
+	"go-tickets/internel/domain/user/dto"
 
 	"gorm.io/gorm"
 

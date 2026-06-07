@@ -1,7 +1,7 @@
 package event
 
 import (
-	"go-tickets/internel/event/dto"
+	"go-tickets/internel/domain/event/dto"
 	"time"
 
 	"gorm.io/gorm"

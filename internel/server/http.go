@@ -2,9 +2,9 @@ package server
 
 import (
 	"go-tickets/internel/config"
-	"go-tickets/internel/event"
+	"go-tickets/internel/domain/event"
+	"go-tickets/internel/domain/user"
 	httpresponse "go-tickets/internel/httpResponse"
-	"go-tickets/internel/user"
 	"net/http"
 
 	"github.com/fatih/color"

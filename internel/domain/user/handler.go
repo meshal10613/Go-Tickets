@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	httpresponse "go-tickets/internel/httpResponse"
-	"go-tickets/internel/user/dto"
+	"go-tickets/internel/domain/user/dto"
 	"net/http"
 
 	"github.com/labstack/echo/v5"

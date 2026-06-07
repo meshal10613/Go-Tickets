@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"go-tickets/internel/auth"
-	"go-tickets/internel/user/dto"
+	"go-tickets/internel/domain/user/dto"
 )
 
 var ErrorInvalidCredentials = errors.New("Invalid email or password")

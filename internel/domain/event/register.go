@@ -18,4 +18,5 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	api.POST("", handler.Create, middlewares.AuthMiddleware(jwtService))
 	api.GET("", handler.GetAll)
 	api.GET("/:id", handler.GetByID)
+	api.PATCH("/:id", handler.Update, middlewares.AuthMiddleware(jwtService))
 }
