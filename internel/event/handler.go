@@ -5,6 +5,7 @@ import (
 	"go-tickets/internel/event/dto"
 	httpresponse "go-tickets/internel/httpResponse"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v5"
 )
@@ -53,13 +54,49 @@ func (h *handler) Create(c *echo.Context) error {
 		})
 	}
 
-	response, err := h.service.Create(req); if err != nil {
+	response, err := h.service.Create(req)
+	if err != nil {
 		return eventErrorResponse(c, err)
 	}
 
 	return c.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "Event created successfully",
-		Data: response,
+		Data:    response,
+	})
+}
+
+func (h *handler) GetAll(c *echo.Context) error {
+	events, err := h.service.GetAll()
+	if err != nil {
+		return eventErrorResponse(c, err)
+	}
+
+	return c.JSON(http.StatusOK, httpresponse.Success{
+		Success: true,
+		Message: "Events retrived successfully",
+		Data:    events,
+	})
+}
+
+func (h *handler) GetByID(c *echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, httpresponse.Error{
+			Success: false,
+			Message: "Invalid event id",
+			Details: err.Error(),
+		})
+	}
+
+	response, err := h.service.GetByID(uint(id))
+	if err != nil {
+		return eventErrorResponse(c, err)
+	}
+
+	return c.JSON(http.StatusOK, httpresponse.Success{
+		Success: true,
+		Message: "Event retrived successfully",
+		Data:    response,
 	})
 }
