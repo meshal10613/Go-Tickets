@@ -2,7 +2,7 @@ package user
 
 import (
 	"errors"
-	httpsresponse "go-tickets/internel/httpsResponse"
+	httpresponse "go-tickets/internel/httpResponse"
 	"go-tickets/internel/user/dto"
 	"net/http"
 
@@ -22,7 +22,7 @@ func NewHandler(service *service) *handler {
 func (h *handler) RegisterUser(ctx *echo.Context) error {
 	var req dto.RegisterUserRequest
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+		return ctx.JSON(http.StatusBadRequest, httpresponse.Error{
 			Success: false,
 			Message: "Invalid request payload",
 			Details: err.Error(),
@@ -30,7 +30,7 @@ func (h *handler) RegisterUser(ctx *echo.Context) error {
 	}
 
 	if err := ctx.Validate(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+		return ctx.JSON(http.StatusBadRequest, httpresponse.Error{
 			Success: false,
 			Message: "Validation failed",
 			Details: err.Error(),
@@ -40,19 +40,19 @@ func (h *handler) RegisterUser(ctx *echo.Context) error {
 	response, err := h.service.RegisterUser(&req)
 	if err != nil {
 		if errors.Is(err, ErrorAlreadyExist) {
-			return ctx.JSON(http.StatusConflict, httpsresponse.Error{
+			return ctx.JSON(http.StatusConflict, httpresponse.Error{
 				Success: false,
 				Message: err.Error(),
 			})
 		}
 
-		return ctx.JSON(http.StatusInternalServerError, httpsresponse.Error{
+		return ctx.JSON(http.StatusInternalServerError, httpresponse.Error{
 			Success: false,
 			Message: "Failed to register user",
 			Details: err.Error(),
 		})
 	}
-	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
+	return ctx.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "User registered successfully",
 		Data:    response,
@@ -62,7 +62,7 @@ func (h *handler) RegisterUser(ctx *echo.Context) error {
 func (h *handler) LoginUser(ctx *echo.Context) error {
 	var req dto.LoginUserRequest
 	if err := ctx.Bind(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+		return ctx.JSON(http.StatusBadRequest, httpresponse.Error{
 			Success: false,
 			Message: "Invalid request payload",
 			Details: err.Error(),
@@ -70,7 +70,7 @@ func (h *handler) LoginUser(ctx *echo.Context) error {
 	}
 
 	if err := ctx.Validate(&req); err != nil {
-		return ctx.JSON(http.StatusBadRequest, httpsresponse.Error{
+		return ctx.JSON(http.StatusBadRequest, httpresponse.Error{
 			Success: false,
 			Message: "Validation failed",
 			Details: err.Error(),
@@ -80,19 +80,19 @@ func (h *handler) LoginUser(ctx *echo.Context) error {
 	response, err := h.service.LoginUser(&req)
 	if err != nil {
 		if errors.Is(err, ErrorInvalidCredentials) {
-			return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+			return ctx.JSON(http.StatusUnauthorized, httpresponse.Error{
 				Success: false,
 				Message: err.Error(),
 			})
 		}
 
-		return ctx.JSON(http.StatusInternalServerError, httpsresponse.Error{
+		return ctx.JSON(http.StatusInternalServerError, httpresponse.Error{
 			Success: false,
 			Message: "Failed to login user",
 			Details: err.Error(),
 		})
 	}
-	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
+	return ctx.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "User logged in successfully",
 		Data:    response,
@@ -102,7 +102,7 @@ func (h *handler) LoginUser(ctx *echo.Context) error {
 func (h *handler) GetMe(ctx *echo.Context) error {
 	userID, ok := ctx.Get("user_id").(uint)
 	if !ok {
-		return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+		return ctx.JSON(http.StatusUnauthorized, httpresponse.Error{
 			Success: false,
 			Message: "Failed to retrieve authenticated user information",
 		})
@@ -117,7 +117,7 @@ func (h *handler) GetMe(ctx *echo.Context) error {
 		Email: email,
 	}
 
-	return ctx.JSON(http.StatusCreated, httpsresponse.Success{
+	return ctx.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "User profile retrieved successfully",
 		Data:    response,

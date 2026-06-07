@@ -16,13 +16,13 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 
 	e.Validator = validation.NewCustomValidator(validate)
 
-	userRepository := NewUserRepository(db)
+	repository := NewRepository(db)
 	jwtService := auth.NewJwtService("") //? You can pass secret key from config
-	userService := NewService(userRepository, jwtService)
-	userHandler := NewHandler(userService)
+	service := NewService(repository, jwtService)
+	handler := NewHandler(service)
 
 	api := e.Group("/api/v1/auth")
-	api.POST("/register", userHandler.RegisterUser)
-	api.POST("/login", userHandler.LoginUser)
-	api.GET("/me", userHandler.GetMe, middlewares.AuthMiddleware(jwtService))
+	api.POST("/register", handler.RegisterUser)
+	api.POST("/login", handler.LoginUser)
+	api.GET("/me", handler.GetMe, middlewares.AuthMiddleware(jwtService))
 }

@@ -2,6 +2,8 @@ package server
 
 import (
 	"go-tickets/internel/config"
+	"go-tickets/internel/event"
+	httpresponse "go-tickets/internel/httpResponse"
 	"go-tickets/internel/user"
 	"net/http"
 
@@ -13,16 +15,20 @@ import (
 
 func StartServer(db *gorm.DB, cfg *config.Config) {
 	e := echo.New()
-	db.AutoMigrate(&user.User{})
+	db.AutoMigrate(&user.User{}, &event.Event{})
 
 	e.Use(middleware.RequestLogger())
 
 	e.GET("/", func(c *echo.Context) error {
-		return c.String(http.StatusOK, "Hello, World!")
+		return c.JSON(http.StatusOK, httpresponse.Success{
+			Success: true,
+			Message: "Server is running successfully....",
+		})
 	})
 
 	//? User routes
 	user.RegisterRoutes(e, db)
+	event.RegisterRoutes(e, db)
 
 	red := color.New(color.FgRed).SprintFunc()
 	color.Green("🚀 Server running at http://localhost:%s", cfg.Port)

@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"go-tickets/internel/auth"
-	httpsresponse "go-tickets/internel/httpsResponse"
+	httpsresponse "go-tickets/internel/httpResponse"
 	"net/http"
 	"strings"
 
