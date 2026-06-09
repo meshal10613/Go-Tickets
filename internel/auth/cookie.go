@@ -7,6 +7,11 @@ import (
 )
 
 func SetAuthCookie(ctx *echo.Context, token string) {
+	tokenDuration, err := ParseDuration()
+	if err != nil {
+		tokenDuration = 24
+	}
+
 	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    token,
@@ -14,7 +19,7 @@ func SetAuthCookie(ctx *echo.Context, token string) {
 		HttpOnly: true,
 		Secure:   true, // false for local development
 		SameSite: http.SameSiteLaxMode,
-		MaxAge:   60 * 60 * 24 * 1, // 1 days
+		MaxAge:   int(tokenDuration.Seconds()),
 	}
 
 	ctx.SetCookie(cookie)

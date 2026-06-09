@@ -34,11 +34,15 @@ func NewJwtService(secretKey string) JwtService {
 	if secretKey == "" {
 		secretKey = cfg.JwtSecretKey
 	}
-	defaultTokenDuration := 24 * time.Hour
+
+	tokenDuration, err := ParseDuration()
+	if err != nil {
+		tokenDuration = 24 * time.Hour
+	}
 
 	return &jwtService{
 		secretKey:     secretKey,
-		tokenDuration: defaultTokenDuration,
+		tokenDuration: tokenDuration,
 	}
 }
 
