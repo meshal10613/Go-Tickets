@@ -4,7 +4,6 @@ import (
 	"go-tickets/internel/auth"
 	httpsresponse "go-tickets/internel/httpResponse"
 	"net/http"
-	"strings"
 
 	"github.com/labstack/echo/v5"
 )
@@ -12,24 +11,34 @@ import (
 func AuthMiddleware(jwtService auth.JwtService) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(ctx *echo.Context) error {
-			//? extract token from authorization header
-			authHeader := ctx.Request().Header.Get("Authorization")
-			if authHeader == "" {
+			// //? extract token from authorization header
+			// authHeader := ctx.Request().Header.Get("Authorization")
+			// if authHeader == "" {
+			// 	return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+			// 		Success: false,
+			// 		Message: "Authorization header is required",
+			// 	})
+			// }
+
+			// //? check bearer scheme
+			// parts := strings.Split(authHeader, " ")
+			// if len(parts) != 2 || parts[0] != "Bearer" {
+			// 	return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
+			// 		Success: false,
+			// 		Message: "Invalid authorization header format. Expected: Bearer <token>",
+			// 	})
+			// }
+			// tokenString := parts[1]
+
+			cookie, err := ctx.Cookie("token")
+			if err != nil {
 				return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
 					Success: false,
-					Message: "Authorization header is required",
+					Message: "Authentication required",
 				})
 			}
 
-			//? check bearer scheme
-			parts := strings.Split(authHeader, " ")
-			if len(parts) != 2 || parts[0] != "Bearer" {
-				return ctx.JSON(http.StatusUnauthorized, httpsresponse.Error{
-					Success: false,
-					Message: "Invalid authorization header format. Expected: Bearer <token>",
-				})
-			}
-			tokenString := parts[1]
+			tokenString := cookie.Value
 
 			//? validate token
 			claims, err := jwtService.ValidateToken(tokenString)

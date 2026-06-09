@@ -2,8 +2,9 @@ package user
 
 import (
 	"errors"
-	httpresponse "go-tickets/internel/httpResponse"
+	"go-tickets/internel/auth"
 	"go-tickets/internel/domain/user/dto"
+	httpresponse "go-tickets/internel/httpResponse"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
@@ -52,6 +53,9 @@ func (h *handler) RegisterUser(ctx *echo.Context) error {
 			Details: err.Error(),
 		})
 	}
+
+	auth.SetAuthCookie(ctx, response.Token)
+
 	return ctx.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "User registered successfully",
@@ -92,6 +96,9 @@ func (h *handler) LoginUser(ctx *echo.Context) error {
 			Details: err.Error(),
 		})
 	}
+	
+	auth.SetAuthCookie(ctx, response.Token)
+
 	return ctx.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "User logged in successfully",
