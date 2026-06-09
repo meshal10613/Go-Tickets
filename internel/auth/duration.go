@@ -8,12 +8,21 @@ import (
 	"time"
 )
 
-func ParseDuration() (time.Duration, error) {
-	cfg, err := config.LoadEnv()
-	if err != nil {
-		panic(fmt.Sprintf("failed to load environment variables: %v", err))
+func ParseDuration(jwtDuration *string) (time.Duration, error) {
+	var duration string
+
+	if jwtDuration != nil {
+		duration = *jwtDuration
+	} else {
+		cfg, err := config.LoadEnv()
+		if err != nil {
+			return 0, fmt.Errorf("failed to load environment variables: %w", err)
+		}
+
+		duration = cfg.JwtDuration
 	}
-	duration := strings.TrimSpace(strings.ToLower(cfg.JwtDuration))
+
+	duration = strings.TrimSpace(strings.ToLower(duration))
 
 	if strings.HasSuffix(duration, "d") {
 		daysStr := strings.TrimSuffix(duration, "d")

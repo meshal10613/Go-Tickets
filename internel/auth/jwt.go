@@ -35,7 +35,7 @@ func NewJwtService(secretKey string) JwtService {
 		secretKey = cfg.JwtSecretKey
 	}
 
-	tokenDuration, err := ParseDuration()
+	tokenDuration, err := ParseDuration(&cfg.JwtDuration)
 	if err != nil {
 		tokenDuration = 24 * time.Hour
 	}

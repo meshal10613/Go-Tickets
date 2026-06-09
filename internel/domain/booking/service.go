@@ -65,3 +65,17 @@ func (s *service) Create(userId uint, req dto.CreateRequest) (*dto.Response, err
 
 	return booking.ToResponse(), nil
 }
+
+func (s *service) GetMyBookings(userId uint, req dto.CreateRequest) ([]*dto.Response, error) {
+	bookings, err := s.bookingRepo.GetByUserID(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	response := make([]*dto.Response, len(bookings)) //? Initialize the slice with the correct length
+	for i, b := range bookings {
+		response[i] = b.ToResponse()
+	}
+
+	return response, nil
+}

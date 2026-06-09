@@ -76,7 +76,7 @@ func (h *handler) Create(c *echo.Context) error {
 	}
 
 	var req dto.CreateRequest
-		if err := c.Bind(&req); err != nil {
+	if err := c.Bind(&req); err != nil {
 		return c.JSON(http.StatusBadRequest, httpresponse.Error{
 			Success: false,
 			Message: "Invalid request payload",
@@ -101,6 +101,28 @@ func (h *handler) Create(c *echo.Context) error {
 	return c.JSON(http.StatusCreated, httpresponse.Success{
 		Success: true,
 		Message: "Booking created successfully",
-		Data: response,
+		Data:    response,
+	})
+}
+
+func (h *handler) GetMyBookings(c *echo.Context) error {
+	userId, ok := getCurrentUserID(c)
+	if !ok {
+		return c.JSON(http.StatusUnauthorized, httpresponse.Success{
+			Success: false,
+			Message: "Unauthorized Access",
+		})
+	}
+
+	var req dto.CreateRequest
+	bookings, err := h.service.GetMyBookings(userId, req)
+	if err != nil {
+		return bookingErrorResponse(c, err)
+	}
+
+	return c.JSON(http.StatusCreated, httpresponse.Success{
+		Success: true,
+		Message: "My bookings retrived successfully",
+		Data:    bookings,
 	})
 }

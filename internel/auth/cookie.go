@@ -7,7 +7,7 @@ import (
 )
 
 func SetAuthCookie(ctx *echo.Context, token string) {
-	tokenDuration, err := ParseDuration()
+	tokenDuration, err := ParseDuration(nil)
 	if err != nil {
 		tokenDuration = 24
 	}

@@ -21,4 +21,5 @@ func RegisterRoutes(e *echo.Echo, db *gorm.DB) {
 	api := e.Group("/api/v1/booking", middlewares.AuthMiddleware(jwtService))
 
 	api.POST("", handler.Create)
+	api.GET("/my-booking", handler.GetMyBookings)
 }
