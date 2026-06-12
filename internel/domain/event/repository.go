@@ -2,6 +2,8 @@ package event
 
 import (
 	"errors"
+	"go-tickets/internel/common/query"
+	"go-tickets/internel/common/querybuilder"
 
 	"gorm.io/gorm"
 )
@@ -10,7 +12,7 @@ var ErrEventNotFound = errors.New("event not found")
 
 type Repository interface {
 	Create(event *Event) error
-	GetAll() ([]*Event, error)
+	GetAll(opts query.QueryParams) ([]*Event, int64, error)
 	GetByID(eventId uint) (*Event, error)
 	Update(event *Event) error
 }
@@ -27,15 +29,22 @@ func (r *repository) Create(event *Event) error {
 	return r.db.Create(event).Error
 }
 
-func (r *repository) GetAll() ([]*Event, error) {
+func (r *repository) GetAll(opts query.QueryParams) ([]*Event, int64, error) {
 	var events []*Event
+	var total int64
 
-	err := r.db.Find(&events).Error
-	if err != nil {
-		return nil, err
-	}
+	qb := querybuilder.New(r.db.Model(&Event{}))
 
-	return events, nil
+	qb.Search(opts.Search, "title", "location")
+	qb.Sort(opts.SortBy, opts.Order)
+
+	qb.DB.Count(&total)
+
+	qb.Paginate(opts.Page, opts.Limit)
+
+	err := qb.DB.Find(&events).Error
+
+	return events, total, err
 }
 
 func (r *repository) GetByID(eventId uint) (*Event, error) {

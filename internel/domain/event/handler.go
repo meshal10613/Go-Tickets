@@ -2,6 +2,7 @@ package event
 
 import (
 	"errors"
+	"go-tickets/internel/common/query"
 	"go-tickets/internel/domain/event/dto"
 	httpresponse "go-tickets/internel/httpResponse"
 	"net/http"
@@ -67,7 +68,24 @@ func (h *handler) Create(c *echo.Context) error {
 }
 
 func (h *handler) GetAll(c *echo.Context) error {
-	events, err := h.service.GetAll()
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+	limit, _ := strconv.Atoi(c.QueryParam("limit"))
+
+	if page == 0 {
+		page = 1
+	}
+
+	if limit == 0 {
+		limit = 10
+	}
+
+	events, err := h.service.GetAll(query.QueryParams{
+		Page:   page,
+		Limit:  limit,
+		Search: c.QueryParam("search"),
+		SortBy: c.QueryParam("sortBy"),
+		Order:  c.QueryParam("order"),
+	})
 	if err != nil {
 		return eventErrorResponse(c, err)
 	}
@@ -75,7 +93,8 @@ func (h *handler) GetAll(c *echo.Context) error {
 	return c.JSON(http.StatusOK, httpresponse.Success{
 		Success: true,
 		Message: "Events retrived successfully",
-		Data:    events,
+		Data:    events.Data,
+		Meta:    events.Meta,
 	})
 }
 

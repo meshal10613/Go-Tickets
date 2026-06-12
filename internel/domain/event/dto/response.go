@@ -1,6 +1,9 @@
 package dto
 
-import "time"
+import (
+	httpresponse "go-tickets/internel/httpResponse"
+	"time"
+)
 
 type Response struct {
 	ID               uint      `json:"id"`
@@ -12,4 +15,9 @@ type Response struct {
 	AvailableTickets int       `json:"available_tickets"`
 	Price            int       `json:"price"`
 	CreatedAt        string    `json:"created_at"`
+}
+
+type PaginationResponse struct {
+	Data []Response
+	Meta httpresponse.Meta
 }

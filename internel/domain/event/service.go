@@ -1,7 +1,9 @@
 package event
 
 import (
+	"go-tickets/internel/common/query"
 	"go-tickets/internel/domain/event/dto"
+	httpresponse "go-tickets/internel/httpResponse"
 )
 
 type service struct {
@@ -32,8 +34,17 @@ func (s *service) Create(req dto.CreateRequest) (*dto.Response, error) {
 	return event.ToResponse(), nil
 }
 
-func (s *service) GetAll() (*[]dto.Response, error) {
-	events, err := s.repo.GetAll()
+func (s *service) GetAll(req query.QueryParams) (*dto.PaginationResponse, error) {
+	events, total, err := s.repo.GetAll(
+		query.QueryParams{
+			Page:   req.Page,
+			Limit:  req.Limit,
+			Search: req.Search,
+			SortBy: req.SortBy,
+			Order:  req.Order,
+		},
+	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +55,17 @@ func (s *service) GetAll() (*[]dto.Response, error) {
 		response = append(response, *event.ToResponse())
 	}
 
-	return &response, nil
+	totalPages := int64((int(total) + req.Limit - 1) / req.Limit)
+
+	return &dto.PaginationResponse{
+		Data: response,
+		Meta: httpresponse.Meta{
+			Page:      req.Page,
+			Limit:     req.Limit,
+			Total:     total,
+			TotalPage: totalPages,
+		},
+	}, nil
 }
 
 func (s *service) GetByID(eventId uint) (*dto.Response, error) {
